@@ -1,4 +1,6 @@
 //function [ws] = CalcP_dp_Ploidy_3D_OnlyTheLoop (p0, freq, d, ploidy, df_ci, dp_ci)
+var jStat = require('jstat').jStat
+var BigNumber = require('bignumber.js')
 
 function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 
@@ -57,9 +59,12 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 	var fs = sequence(freq*(1-df_ci), freq*(1+df_ci), ddf)
 	var dp = sequence(p0*(1-dp_ci), p0*(1+dp_ci), ddp)
 
-	console.log(fs.length, fs[0], fs[1], fs[fs.length-1])
+    // var fs = [freq*(1-df_ci)]//sequence(freq*(1-df_ci), freq*(1+df_ci), ddf)
+    // var dp = [p0*(1-dp_ci)]//sequence(p0*(1-dp_ci), p0*(1+dp_ci), ddp)
 
-	console.log(dp.length, dp[0], dp[1], dp[dp.length-1])
+	console.log('fs ', fs.length, fs[0], fs[fs.length-1])
+
+	console.log('dp ', dp.length, dp[0], dp[dp.length-1])
 
 	//aics = zeros (length(fs), length(dp), size(types, 2));
 
@@ -105,6 +110,10 @@ for j=1:length(dp)
 end
 	*/
 
+    var ws = zeros(fs.length, dp.length, types.length)
+    var aics = zeros(fs.length, dp.length, types.length)
+    console.log('ws', ws)
+
 	for(var j = 0; j < dp.length; j++) {
 		var p = dp[j]
 		for(var k= 0; k < fs.length; k++ ) {
@@ -112,19 +121,22 @@ end
 
 			var aic = []
 			aic[0] = 2 - 2 * Math.log( binopdf( Math.round(d*f), d, (p)/(2*(1-p)+1*p))) 
+
 			if (ploidy > 1) {
-				for(var i = 1; i < ploidy; i++) {
+				for(var i = 1; i <= ploidy; i++) {
 					aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (i * p)/(2*(1-p)+ploidy*p))) )
 				}
 			}
 
+        //aic(l+1) = 2 - 2 * log (binopdf (round(d*f), d, (1-p+p)/(2*(1-p)+1*p))); %germline LOH high CN;        
 			aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (1-p + p)/(2*(1-p)+1*p))) )
 
 			if (ploidy > 1) {
-				for(var i = 1; i < ploidy; i++) {
+				for(var i = 1; i <= ploidy; i++) {
 					aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (1-p + i*p)/(2*(1-p)+ploidy*p))) )
 				}
 			}
+            console.log('aic', aic)
 
 			// w = zeros2D(1, types.length)
 
@@ -141,13 +153,25 @@ end
 				return acc + Math.exp( -0.5 * (curr - aicMin))
 			}, 0)
 
+            console.log('D', D)
+
 			var w = aic.map(function(curr) {
 				return Math.exp( -0.5 * (curr - aicMin))/ D
 			})
+            // rounding needed to match results with matlab
+            w = w.map(function(curr) {
+                return Math.round(curr * 1000) / 1000
+            })
 
-			ws[k][j][types.length] = w
+            console.log('w', w)
+
+			ws[k][j] = w
+
+            console.log('ws', ws)
 			
-			aics[k][j][types.length] = aic
+			aics[k][j] = aic
+
+            console.log('aics', aics)
 
 			// console.log('notNanAic', j, k)
 			// console.log(aic)
@@ -210,10 +234,19 @@ function zeros2D(xSize , ySize) {
 
 }
 
+function binopdf(k, n, p) {
+    //use BigNumber to avoid underflowing (e.g. (1-p)**(n-k) == 0 where 1-p is small and n-k is large)
+    var pow1 = new BigNumber((1-p).toString()).toPower(n - k)
+    return (p === 0 || p === 1) ?
+      ((n * p) === k ? 1 : 0) :
+      pow1.times(Math.pow(p, k).toString()).times(jStat.combination(n, k).toString()).toNumber();
+
+}
+
 
 
 //console.log(binopdf(8, 12, 95))
-function binopdf(vx, vN, p) {
+function binofit(vx, vN, p) {
 	var ret = []
 
 	var tails = calcTails(p)
@@ -297,4 +330,4 @@ function getMinOfArray(numArray) {
 
 
 
-CalcP_dp_Ploidy_3D(1, 1, 3, 5, 6, 7)
+CalcP_dp_Ploidy_3D(0.6, 0.31, 1000, 2, 0.01, 0.05)
