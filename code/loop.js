@@ -54,17 +54,25 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
     var ddf = 0.005
 	var ddp = 0.01
 
+    //[~, df] = binofit(round(d*freq), d, df_ci);
+    // fs = df(1) : ddf : df(2); 
+    // fs = sort([fs(1:end-1), df(2)]);
+
+    var binoret = binofit(d*freq, d, (1 - df_ci) * 100)
+    console.log(d*freq, d, df_ci, binoret)
+
 	//fs = [freq*(1-df_ci), ddf, freq*(1+df_ci)].sort()
 	//dp = [p0*(1-dp_ci) : ddp : p0*(1+dp_ci)].sort()
-	var fs = sequence(freq*(1-df_ci), freq*(1+df_ci), ddf)
-	var dp = sequence(p0*(1-dp_ci), p0*(1+dp_ci), ddp)
+	var fs = sequence(binoret[0], binoret[1], ddf)
+    //var fs = sequence(freq*(1-df_ci), freq*(1+df_ci), ddf)
+    var dp = sequence(p0*(1-dp_ci), p0*(1+dp_ci), ddp)
 
     // var fs = [freq*(1-df_ci)]//sequence(freq*(1-df_ci), freq*(1+df_ci), ddf)
     // var dp = [p0*(1-dp_ci)]//sequence(p0*(1-dp_ci), p0*(1+dp_ci), ddp)
 
-	console.log('fs ', fs.length, fs[0], fs[fs.length-1])
+	console.log('fs ', fs, fs[0], fs[fs.length-1])
 
-	console.log('dp ', dp.length, dp[0], dp[dp.length-1])
+	console.log('dp ', dp, dp[0], dp[dp.length-1])
 
 	//aics = zeros (length(fs), length(dp), size(types, 2));
 
@@ -112,11 +120,10 @@ end
 
     var ws = zeros(fs.length, dp.length, types.length)
     var aics = zeros(fs.length, dp.length, types.length)
-    console.log('ws', ws)
 
-	for(var j = 0; j < dp.length; j++) {
+	for(var j = 0; j < 1/*dp.length*/; j++) {
 		var p = dp[j]
-		for(var k= 0; k < fs.length; k++ ) {
+		for(var k= 0; k < 1/*fs.length*/; k++ ) {
 			f = fs[k]
 
 			var aic = []
@@ -164,14 +171,15 @@ end
             })
 
             console.log('w', w)
+            console.log('aic', aic)
 
 			ws[k][j] = w
 
-            console.log('ws', ws)
+            //console.log('ws', ws)
 			
 			aics[k][j] = aic
 
-            console.log('aics', aics)
+            //console.log('aics', aics)
 
 			// console.log('notNanAic', j, k)
 			// console.log(aic)
