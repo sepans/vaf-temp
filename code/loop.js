@@ -70,9 +70,9 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
     // var fs = [freq*(1-df_ci)]//sequence(freq*(1-df_ci), freq*(1+df_ci), ddf)
     // var dp = [p0*(1-dp_ci)]//sequence(p0*(1-dp_ci), p0*(1+dp_ci), ddp)
 
-	console.log('fs ', fs, fs[0], fs[fs.length-1])
+	console.log('fs ', fs, fs.length)
 
-	console.log('dp ', dp, dp[0], dp[dp.length-1])
+	console.log('dp ', dp, dp.length)
 
 	//aics = zeros (length(fs), length(dp), size(types, 2));
 
@@ -121,9 +121,9 @@ end
     var ws = zeros(fs.length, dp.length, types.length)
     var aics = zeros(fs.length, dp.length, types.length)
 
-	for(var j = 0; j < 1/*dp.length*/; j++) {
+	for(var j = 0; j < dp.length; j++) {
 		var p = dp[j]
-		for(var k= 0; k < 1/*fs.length*/; k++ ) {
+		for(var k= 0; k < fs.length; k++ ) {
 			f = fs[k]
 
 			var aic = []
@@ -143,7 +143,7 @@ end
 					aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (1-p + i*p)/(2*(1-p)+ploidy*p))) )
 				}
 			}
-            console.log('aic', aic)
+            //console.log('aic', aic)
 
 			// w = zeros2D(1, types.length)
 
@@ -160,7 +160,7 @@ end
 				return acc + Math.exp( -0.5 * (curr - aicMin))
 			}, 0)
 
-            console.log('D', D)
+            //console.log('D', D)
 
 			var w = aic.map(function(curr) {
 				return Math.exp( -0.5 * (curr - aicMin))/ D
@@ -169,9 +169,9 @@ end
             w = w.map(function(curr) {
                 return Math.round(curr * 1000) / 1000
             })
-
-            console.log('w', w)
-            console.log('aic', aic)
+            // console.log(j, k)
+            // console.log('w', w)
+            // console.log('aic', aic)
 
 			ws[k][j] = w
 
@@ -188,6 +188,78 @@ end
 
 		}
 	}
+
+    /*
+
+        not_nan = ~isnan(aics);
+
+        // min is a 3 dim min returning 1 number
+        // sum is also 3 dim sum
+        D = sum(exp(-0.5*(aics(not_nan)-min(aics(not_nan)))));
+        ww = exp(-0.5*(aics-min(aics(not_nan)))) / D;
+        disp(aics)
+    */
+
+    //var notNanAics = aics.filter(function(dd) { return dd.filter(function(d) { return !isNaN(d) })}) //needs 3 dims
+    //console.log('notNanAics', notNanAics)
+    console.log(aics.length, aics[0].length, aics[0][0].length)
+
+    aicsMin = getMinOf3DMatrix(aics)
+    console.log(aicsMin)
+
+    var D = reduceAll3D(aics, function(acc, curr) {
+//        console.log(curr, isNaN(curr))
+        return acc + (isNaN(curr) ? 0 : Math.exp( -0.5 * (curr - aicsMin)))
+    }, 0)  
+
+    console.log('D', D)      
+
+    var ww = map3D(aics, function(curr) {
+        return Math.exp( - 0.5 * (curr - aicsMin)) / D 
+    })
+
+    console.log(ww.length, ww[0].length, ww[0][0].length)
+    //console.log(ww)
+    // var D = aic.reduce(function(acc, curr)  {
+    //     return acc + Math.exp( -0.5 * (curr - aicMin))
+    // }, 0)
+
+
+    /*
+
+        sum_ww = zeros (1, size(types, 2));
+        for i=1:size(types, 2)
+            w = ww(:,:,i);
+            // sum_ww is the same size as type vector
+            sum_ww (i) = sum(w(~isnan(w)));
+            pred_outs{i} = sprintf ('%s\t%2.2e', types{i}, sum_ww (i));
+            leg{i} = sprintf ('%s, w = %2.2f', types{i}, sum_ww (i));
+        end
+
+        aics_p = zeros (length(fs), size(types, 2));
+        wf = zeros (length(fs), length(dp), size(types, 2));
+        for j=1:length(dp)
+            for i=1:size(types, 2)
+                aics_p(1:length(fs), i) = aics(:,j,i); 
+            end
+            
+            for k=1:length(fs)
+                aic_f = aics_p(k,:);
+                not_nan = ~isnan(aic_f);
+                D = sum(exp(-0.5*(aic_f(not_nan)-min(aic_f(not_nan)))));
+                wf(k, j, 1:size(types, 2)) = exp(-0.5*(aic_f-min(aic_f(not_nan)))) / D;
+            end
+        end
+            
+        [~, i] = sort (sum_ww, 'descend');
+        fprintf ('%i\t%s\t%2.2e\t%s\t%2.2e\n', round(p0*100), types{i(1)}, sum_ww(i(1)), types{i(2)}, sum_ww(i(2)));
+
+        pred_out = sprintf ('%s (%2.2f)', types{i(1)}, sum_ww(i(1)));
+        if (max(sum_ww) < 0.99) 
+            pred_out = sprintf ('%s, %s (%2.2f)', pred_out, types{i(2)}, sum_ww(i(2)));
+        end
+
+    */
 }
 
 
@@ -335,7 +407,31 @@ function getMinOfArray(numArray) {
   return Math.min.apply(null, numArray);
 }
 
+function getMinOf3DMatrix(mat) {
+   var flatten = [].concat.apply([], [].concat.apply([], mat))
+   return getMinOfArray(flatten)
+}
+
+function reduceAll3D(mat, fn, init) {
+   var flatten = [].concat.apply([], [].concat.apply([], mat))
+   return flatten.reduce(fn, init ? init : 0)
+}
+
+function map3D(mat, fn) {
+    return mat.map(function(dim0) {
+        return dim0.map(function(dim1) {
+            return dim1.map(function(el) {
+                return fn(el)
+            })
+        })
+    })
+
+}
 
 
+//getMinOf3DMatrix([[[1, 2],[2, 3]],[[4, 0],[-1, 4]]])
+//console.log(map3D([[[1, 2],[2, 3]],[[4, 0],[-1, 4]]], function(d) { return d+1}))
+
+//console.log(reduceAll3D([[[1, 2],[2, 3]],[[4, 0],[-1, 4]]], function(acc, curr) { return acc + curr}, 0))
 
 CalcP_dp_Ploidy_3D(0.6, 0.31, 1000, 2, 0.01, 0.05)
