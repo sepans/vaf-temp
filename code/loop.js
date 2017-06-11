@@ -345,10 +345,10 @@ end
         var means2ndDim = kSlice.map(function(dim1) { return d3.mean(dim1)})
         var std2ndDim = kSlice.map(function(dim1) { return d3.deviation(dim1)})
         var up = means2ndDim.map(function(mean, i) {
-            return Math.min(means2ndDim[i] + std2ndDim[i], 1) - mean
+            return Math.min(means2ndDim[i] + std2ndDim[i], 1) //- mean
         })
         var down = means2ndDim.map(function(mean, i) {
-            return Math.max(means2ndDim[i] - std2ndDim[i], 1) - mean
+            return Math.max(means2ndDim[i] - std2ndDim[i], 1) //+ mean
         })
         plotData.push({
             up: up,
