@@ -348,7 +348,7 @@ end
             return Math.min(means2ndDim[i] + std2ndDim[i], 1) //- mean
         })
         var down = means2ndDim.map(function(mean, i) {
-            return Math.max(means2ndDim[i] - std2ndDim[i], 1) //+ mean
+            return Math.max(means2ndDim[i] - std2ndDim[i], 0) //+ mean
         })
         plotData.push({
             up: up,

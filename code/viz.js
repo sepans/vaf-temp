@@ -56,7 +56,7 @@ function drawChart(fs, data) {
 
 	var upArea = d3.area()
 		    .curve(d3.curveBasis)
-		    .x0(function(d, i) { console.log('ar', d, i); return x(fs[i]); })
+		    .x0(function(d, i) { return x(fs[i]); })
 		    .x1(function(d, i) { return x(fs[i]); })
 	        .y0( function(d) { return y(d.up) } )
           	.y1(  function(d) { return y(d.down) } );	    
@@ -112,13 +112,13 @@ function drawChart(fs, data) {
 	      .attr("d", function(d, i) { return line(d.line); })
 	      .style("stroke", function(d, i) { return z(i); });
 
-	   // city.append('path')
-	   // 		.attr('class', ' area up')   
-		  //    .attr("d", function(d, i) { return upArea(d.updown) })
-	   //    	.style("fill", function(d, i) { return z(i); })
-	   //    	.style("stroke", function(d, i) { return z(i); })
-	   //    	.style("stroke-opacity", 0.2)
-	   //    	.style("fill-opacity", 0.1);
+	   city.append('path')
+	   		.attr('class', ' area up')   
+		     .attr("d", function(d, i) { return upArea(d.updown) })
+	      	.style("fill", function(d, i) { return z(i); })
+	      	.style("stroke", function(d, i) { return z(i); })
+	      	.style("stroke-opacity", 0.2)
+	      	.style("fill-opacity", 0.1);
 
 	   // city.append('path')
 	   // 		.attr('class', ' area down')   
@@ -129,17 +129,17 @@ function drawChart(fs, data) {
 	   //    	.style("fill-opacity", 0.1);
 
 
-	  city.append("path")
-	      .attr("class", "line up")
-	      .attr("d", function(d, i) { console.log(d, i); return line(d.up); })
-	      .style('stroke-dasharray', '3, 3')
-	      .style("stroke", function(d, i) { return z(i); });
+	  // city.append("path")
+	  //     .attr("class", "line up")
+	  //     .attr("d", function(d, i) { console.log(d, i); return line(d.up); })
+	  //     .style('stroke-dasharray', '3, 3')
+	  //     .style("stroke", function(d, i) { return z(i); });
 
-	  city.append("path")
-	      .attr("class", "line down")
-	      .attr("d", function(d, i) { return line(d.down); })
-	      .style('stroke-dasharray', '3, 3')
-	      .style("stroke", function(d, i) { return z(i); });
+	  // city.append("path")
+	  //     .attr("class", "line down")
+	  //     .attr("d", function(d, i) { return line(d.down); })
+	  //     .style('stroke-dasharray', '3, 3')
+	  //     .style("stroke", function(d, i) { return z(i); });
 	      
 	  city.selectAll('.circle')
 	  	.data(d => d.line)
