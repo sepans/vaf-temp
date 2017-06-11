@@ -1,6 +1,11 @@
 //function [ws] = CalcP_dp_Ploidy_3D_OnlyTheLoop (p0, freq, d, ploidy, df_ci, dp_ci)
-var jStat = require('jstat').jStat
-var BigNumber = require('bignumber.js')
+
+//to make code run both with node and browser
+if(typeof require!=='undefined') {
+    var jStat = require('jstat').jStat
+    var BigNumber = require('bignumber.js')
+    var math = require('mathjs');
+}
 
 function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 
@@ -121,9 +126,9 @@ end
     var ws = zeros(fs.length, dp.length, types.length)
     var aics = zeros(fs.length, dp.length, types.length)
 
-	for(var j = 0; j < dp.length; j++) {
+	for(var j = 0; j < 2/*dp.length*/; j++) {
 		var p = dp[j]
-		for(var k= 0; k < fs.length; k++ ) {
+		for(var k= 0; k < 2/*fs.length*/; k++ ) {
 			f = fs[k]
 
 			var aic = []
@@ -208,7 +213,6 @@ end
     console.log(aicsMin)
 
     var D = reduceAll3D(aics, function(acc, curr) {
-//        console.log(curr, isNaN(curr))
         return acc + (isNaN(curr) ? 0 : Math.exp( -0.5 * (curr - aicsMin)))
     }, 0)  
 
@@ -235,34 +239,182 @@ end
             pred_outs{i} = sprintf ('%s\t%2.2e', types{i}, sum_ww (i));
             leg{i} = sprintf ('%s, w = %2.2f', types{i}, sum_ww (i));
         end
-
-        aics_p = zeros (length(fs), size(types, 2));
-        wf = zeros (length(fs), length(dp), size(types, 2));
-        for j=1:length(dp)
-            for i=1:size(types, 2)
-                aics_p(1:length(fs), i) = aics(:,j,i); 
-            end
-            
-            for k=1:length(fs)
-                aic_f = aics_p(k,:);
-                not_nan = ~isnan(aic_f);
-                D = sum(exp(-0.5*(aic_f(not_nan)-min(aic_f(not_nan)))));
-                wf(k, j, 1:size(types, 2)) = exp(-0.5*(aic_f-min(aic_f(not_nan)))) / D;
-            end
-        end
-            
-        [~, i] = sort (sum_ww, 'descend');
-        fprintf ('%i\t%s\t%2.2e\t%s\t%2.2e\n', round(p0*100), types{i(1)}, sum_ww(i(1)), types{i(2)}, sum_ww(i(2)));
-
-        pred_out = sprintf ('%s (%2.2f)', types{i(1)}, sum_ww(i(1)));
-        if (max(sum_ww) < 0.99) 
-            pred_out = sprintf ('%s, %s (%2.2f)', pred_out, types{i(2)}, sum_ww(i(2)));
-        end
-
     */
+    
+    var sum_ww = sumOfFirst2Dims(ww)
+
+    var pred_outs = sum_ww.map((d, i) => `${types[i]}   ${d.toFixed(2)}`)
+    var leg = sum_ww.map((d, i) => `${types[i]}, w = ${d.toFixed(2)}`)
+
+    // console.log(sum_ww)
+    // console.log(pred_outs)
+    // console.log(leg)
+
+    /*
+    // NEW LOOP (above code with loop instead of matrix operations)
+    aics_p = zeros (length(fs), size(types, 2));
+    wf = zeros (length(fs), length(dp), size(types, 2));
+    for j=1:length(dp)
+        for i=1:size(types, 2)
+            for k=1:length(fs)
+                aics_p(k, i) = aics(k,j,i);
+            end
+        end
+
+        for k=1:length(fs)
+            for i=1:size(types, 2)
+                aic_f(i) = aics_p(k,i);
+            end
+            not_nan = ~isnan(aic_f);
+            D = sum(exp(-0.5*(aic_f(not_nan)-min(aic_f(not_nan)))));
+            wf(k, j, 1:size(types, 2)) = exp(-0.5*(aic_f-min(aic_f(not_nan)))) / D;
+        end
+    end
+*/
+    var aics_p = zeros2D(fs.length, types.length)
+    var wf = zeros(fs.length, dp.length, types.length)
+    var aic_f = []
+    //console.log('wf', wf)
+    for(var j = 0; j<dp.length; j++) {
+        
+        for(var i = 0; i< types.length; i++) {
+            for(var k = 0; k < fs.length; k++) {
+                aics_p[k][i] = aics[k][j][i]
+            }
+        }
+       // console.log('aics_p', aics_p)
+        for(var k = 0; k < fs.length; k++) {
+            for(var i = 0; i< types.length; i++) {
+                aic_f[i] = aics_p[k][i]
+            }
+
+            var D = aic_f.reduce(function(acc, curr) {
+                return acc + (isNaN(curr) ? 0 : Math.exp( -0.5 * (curr - aicsMin)))
+            }, 0) 
+
+            //console.log('k D', k, D)
+            wf_element = aic_f.map(function(curr) {
+                return Math.exp( - 0.5 * (curr - aicsMin)) / D 
+            })
+            //console.log('wf_element', wf_element)
+            wf[k][j] = wf_element
+
+            
+
+        }
+    }
+    //console.log('wf after', wf)
+
+    console.log('wf', wf.length, wf[0].length, wf[0][0].length)
+
+    /*
+    [~, i] = sort (sum_ww, 'descend');
+    fprintf ('%i\t%s\t%2.2e\t%s\t%2.2e\n', round(p0*100), types{i(1)}, sum_ww(i(1)), types{i(2)}, sum_ww(i(2)));
+
+    pred_out = sprintf ('%s (%2.2f)', types{i(1)}, sum_ww(i(1)));
+    if (max(sum_ww) < 0.99) 
+        pred_out = sprintf ('%s, %s (%2.2f)', pred_out, types{i(2)}, sum_ww(i(2)));
+    end
+*/
+
+/*
+for k=1:size(types, 2)
+    up = min(mean(wf(:,:,k), 2)+std(wf(:,:,k), 0, 2), 1)-mean(wf(:,:,k), 2);
+    down = -max(mean(wf(:,:,k), 2)-std(wf(:,:,k), 0, 2), 0)+mean(wf(:,:,k), 2);
+    %disp('up')
+    %disp(up)
+    %disp('down')
+    %disp(down)
+    ps = shadedErrorBar (fs, mean(wf(:,:,k), 2), [up down], '.', Colors{k}); 
+    if (size(ps.patch,1))
+        ps.patch.FaceColor = Colors{k}; ps.edge(1).Color = Colors{k}; ps.edge(2).Color = Colors{k};
+    end
+    hold on;
+    pp(k) = plot (fs, mean(wf(:,:,k), 2), 'o-', 'Color', Colors{k}, 'MarkerSize', 5, 'LineWidth', 2);  
+    set(pp(k),'MarkerEdgeColor','k','MarkerFaceColor', Colors{k});
+    hold on; 
+end
+*/
+    //var means = means = wf.map(dim1 => dim1.map(dim2 => { console.log(dim2); return d3.mean(dim2)}))
+    var plotData = []
+    for(var k = 0; k< types.length; k++) {
+        //wfmat = math.matrix(wf)
+        //newMat = wfmat.subset([0, 16], [0, 8], k)
+        var kSlice = slice3DDim3(wf, k)
+        console.log(kSlice)
+        var means2ndDim = kSlice.map(function(dim1) { return d3.mean(dim1)})
+        var std2ndDim = kSlice.map(function(dim1) { return d3.deviation(dim1)})
+        var up = means2ndDim.map(function(mean, i) {
+            return Math.min(means2ndDim[i] + std2ndDim[i], 1) - mean
+        })
+        var down = means2ndDim.map(function(mean, i) {
+            return Math.max(means2ndDim[i] - std2ndDim[i], 1) - mean
+        })
+        plotData.push({
+            up: up,
+            down: down,
+            line: means2ndDim,
+            lable: leg[k]
+        })
+        //console.log(wf)
+        //var data = sumOfFirst2Dims(wf).map(function(d) { return d / types.length})
+        //console.log('data', data)
+
+
+    }
+    console.log(plotData)
+
+    return plotData
+
+
+}// what is this?
+
+
+//sumOfFirst2Dims([[[1, 2, 4],[2, 3, 5]],[[4, 0, 2],[-1, 4, 3]], [[1, 0, 1],[1, 1, 1]], [[0, 0, 2],[1, 1, 3]]])
+function sumOfFirst2Dims(mat) {
+    var dim1 = mat.length
+        dim2 = mat[0].length
+        dim3 = mat[0][0].length
+
+    var sum = new Array(dim3)
+    for(var k=0; k< dim3; k++) {
+        sum[k] = 0
+        for(var i=0; i< dim1; i++) {
+            for(var j=0; j< dim2; j++) {
+                sum[k] = sum[k] + mat[i][j][k]
+            }
+        }
+
+    }
+    return sum;  
+
 }
 
+var mat = [[[1, 2, 4],[2, 3, 5]],[[4, 0, 2],[-1, 4, 3]], [[1, 0, 1],[1, 1, 1]], [[0, 0, 2],[1, 1, 3]]]
+var aa = slice3DDim3(mat, 0)
+console.log(mat)
+console.log(aa)
+function slice3DDim3(mat, dim3slice) {
+    var ret = []
+    mat.forEach(function(dim1, i) {
+        ret[i] = []
+        dim1.forEach(function(dim2, j) {
+            dim2.forEach(function(el, k) {
+                if(k===dim3slice) {
+                    ret[i][j] = el
+                }
+            })
+        })
+    })
+    return ret;
 
+}
+
+function size3D(mat) {
+    return [mat.length, mat[0].length, mat[0][0].length]
+}
+
+ 
 
 //console.log(notNanArr([-2, -1, 0, 1, 2].map(d => 0/d)))
 function notNanArr(arr) {
@@ -429,9 +581,10 @@ function map3D(mat, fn) {
 }
 
 
+
 //getMinOf3DMatrix([[[1, 2],[2, 3]],[[4, 0],[-1, 4]]])
 //console.log(map3D([[[1, 2],[2, 3]],[[4, 0],[-1, 4]]], function(d) { return d+1}))
 
 //console.log(reduceAll3D([[[1, 2],[2, 3]],[[4, 0],[-1, 4]]], function(acc, curr) { return acc + curr}, 0))
 
-CalcP_dp_Ploidy_3D(0.6, 0.31, 1000, 2, 0.01, 0.05)
+//CalcP_dp_Ploidy_3D(0.6, 0.31, 1000, 2, 0.01, 0.05)
