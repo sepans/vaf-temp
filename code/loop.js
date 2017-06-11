@@ -9,7 +9,7 @@ if(typeof require!=='undefined') {
 
 function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 
-
+    console.log('called with args', arguments)
 // types = {};
 // types{1} = 'Somatic LOH CNmut = 1';
 // if (ploidy > 1)
@@ -126,9 +126,9 @@ end
     var ws = zeros(fs.length, dp.length, types.length)
     var aics = zeros(fs.length, dp.length, types.length)
 
-	for(var j = 0; j < 2/*dp.length*/; j++) {
+	for(var j = 0; j < dp.length; j++) {
 		var p = dp[j]
-		for(var k= 0; k < 2/*fs.length*/; k++ ) {
+		for(var k= 0; k < fs.length; k++ ) {
 			f = fs[k]
 
 			var aic = []
@@ -364,7 +364,7 @@ end
     }
     console.log(plotData)
 
-    return plotData
+    return [fs, plotData]
 
 
 }// what is this?
