@@ -1,4 +1,4 @@
-function [ww, wf, pred_outs] = CalcP_dp_Ploidy_3D (p0, freq, d, ploidy, df_ci, dp_ci)
+function [] = CalcP_dp_Ploidy_3D (p0, freq, d, ploidy, df_ci, dp_ci) %[ww, wf, pred_outs]
 
 ddf = 0.005;
 ddp = 0.01;
@@ -81,6 +81,7 @@ end
 not_nan = ~isnan(aics);
 D = sum(exp(-0.5*(aics(not_nan)-min(aics(not_nan)))));
 ww = exp(-0.5*(aics-min(aics(not_nan)))) / D;
+disp(aics)
 
 sum_ww = zeros (1, size(types, 2));
 for i=1:size(types, 2)
@@ -89,7 +90,7 @@ for i=1:size(types, 2)
     pred_outs{i} = sprintf ('%s\t%2.2e', types{i}, sum_ww (i));
     leg{i} = sprintf ('%s, w = %2.2f', types{i}, sum_ww (i));
 end
-
+%{
 aics_p = zeros (length(fs), size(types, 2));
 wf = zeros (length(fs), length(dp), size(types, 2));
 for j=1:length(dp)
@@ -104,7 +105,28 @@ for j=1:length(dp)
         wf(k, j, 1:size(types, 2)) = exp(-0.5*(aic_f-min(aic_f(not_nan)))) / D;
     end
 end
-    
+ %}
+% new loop
+aics_p = zeros (length(fs), size(types, 2));
+wf = zeros (length(fs), length(dp), size(types, 2));
+for j=1:length(dp)
+    for i=1:size(types, 2)
+        for k=1:length(fs)
+            aics_p(k, i) = aics(k,j,i);
+        end
+    end
+
+    for k=1:length(fs)
+        for i=1:size(types, 2)
+            aic_f(i) = aics_p(k,i);
+        end
+        not_nan = ~isnan(aic_f);
+        D = sum(exp(-0.5*(aic_f(not_nan)-min(aic_f(not_nan)))));
+        wf(k, j, 1:size(types, 2)) = exp(-0.5*(aic_f-min(aic_f(not_nan)))) / D;
+    end
+end
+
+
 [~, i] = sort (sum_ww, 'descend');
 fprintf ('%i\t%s\t%2.2e\t%s\t%2.2e\n', round(p0*100), types{i(1)}, sum_ww(i(1)), types{i(2)}, sum_ww(i(2)));
 
@@ -117,6 +139,10 @@ figure;
 for k=1:size(types, 2)
     up = min(mean(wf(:,:,k), 2)+std(wf(:,:,k), 0, 2), 1)-mean(wf(:,:,k), 2);
     down = -max(mean(wf(:,:,k), 2)-std(wf(:,:,k), 0, 2), 0)+mean(wf(:,:,k), 2);
+    %disp('up')
+    %disp(up)
+    %disp('down')
+    %disp(down)
     ps = shadedErrorBar (fs, mean(wf(:,:,k), 2), [up down], '.', Colors{k}); 
     if (size(ps.patch,1))
         ps.patch.FaceColor = Colors{k}; ps.edge(1).Color = Colors{k}; ps.edge(2).Color = Colors{k};
