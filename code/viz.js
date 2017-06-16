@@ -1,6 +1,6 @@
 var variables = ['p0', 'freq', 'd', 'ploidy', 'df_ci', 'dp_ci']
-//var defaults = [0.6, 0.31, 1000, 2, 0.01, 0.05]
-var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
+var defaults = [0.6, 0.31, 1000, 2, 0.01, 0.05]
+//var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 
 drawInputs()
 
@@ -15,25 +15,77 @@ function init() {
 
 	var fs = allPlotData[0]
 		plotData = allPlotData[1]
+		all_freq = allPlotData[2]
 
 	calculating.style('opacity', 0)
 
 	drawChart(fs, plotData)
 
+	drawChart2(all_freq)
 }
 
 init()
 
+function drawChart2(all_freq) {
 
-function drawChart(fs, data) {
-
-	var svg = d3.select("svg"),
-	    margin = {top: 20, right: 80, bottom: 30, left: 50},
+	var svg = d3.select("#chart2"),
+	    margin = {top: 20, right: 80, bottom: 20, left: 50},
 	    width = 400 - margin.left - margin.right,
 	    height = 500 - margin.top - margin.bottom,
 	    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	var parseTime = d3.timeParse("%Y%m%d");
+	var x = d3.scaleLinear().range([0, width]),//d3.scaleTime().range([0, width]),
+	    y = d3.scaleLinear().range([height, 0]),
+	    z = d3.scaleOrdinal(d3.schemeCategory10);
+//	    z2 = d3.scaleOrdinal(d3.schemeCategory10);
+
+	var line = d3.line()
+	    .curve(d3.curveCardinal)
+	    .y(function(d, i) { return y(i* 0.01); })
+	    .x(function(d) { return x(d); });
+
+	x.domain([0, 1]);
+
+	  //y.domain([d3.min(data, d => d3.min(d.up)), d3.max(data, d => d3.max(d.down))]);
+	y.domain([0, 1])
+
+	 z.domain(all_freq.length);
+
+	  g.append("g")
+	      .attr("class", "axis axis--x")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(d3.axisBottom(x));
+
+	  g.append("g")
+	      .attr("class", "axis axis--y")
+	      .call(d3.axisLeft(y))
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", "0.71em")
+	      .attr("fill", "#000")
+	      //.text("Temperature, ºF");
+
+	  var city = g.selectAll(".city")
+	    .data(all_freq)
+	    .enter().append("g")
+	      .attr("class", "city");
+
+	  city.append("path")
+	      .attr("class", "line")
+	      .attr("d", function(d, i) { return line(d); })
+	      .style("stroke", function(d, i) { return z(i); });	 
+
+}
+
+
+function drawChart(fs, data) {
+
+	var svg = d3.select("#chart1"),
+	    margin = {top: 20, right: 80, bottom: 30, left: 50},
+	    width = 400 - margin.left - margin.right,
+	    height = 500 - margin.top - margin.bottom,
+	    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	data.map(d => {
 		return d.updown = d.up.map((dd, i) => { return {up: d.up[i], down: d.down[i]}}) 
@@ -154,7 +206,7 @@ function drawChart(fs, data) {
 
 	  city.append("text")
 	      .datum(function(d) { return d})
-	      .attr("transform", function(d, i) { return "translate(500," + (i*15) + ")"; })
+	      .attr("transform", function(d, i) { return "translate(300," + (i*15) + ")"; })
 	      .attr("x", 3)
 	      .attr("dy", "0.35em")
 	      .style("font", "10px sans-serif")
@@ -182,6 +234,7 @@ function drawInputs() {
 	variableEl.append('button')
 		.text( 'draw')
 		.on('click', function(e) {
+			console.log('calculating opacity 1 on')
 			calculating.style('opacity', 1)
 
 			var values = variables.map(d => +document.getElementById('input-'+d).value)
@@ -192,16 +245,10 @@ function drawInputs() {
 				plotData = allPlotData[1]
 
 			console.log('draw new chart', allPlotData)
-			d3.select('svg g').remove()
+			d3.select('#chart1 g').remove()
+			console.log('calculating opacity 0')
 			calculating.style('opacity', 0)
 			drawChart(fs, plotData)
 		})
 
-}
-
-
-function type(d, _, columns) {
-  d.date = parseTime(d.date);
-  for (var i = 1, n = columns.length, c; i < n; ++i) d[c = columns[i]] = +d[c];
-  return d;
 }

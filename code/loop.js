@@ -1,6 +1,6 @@
 //function [ws] = CalcP_dp_Ploidy_3D_OnlyTheLoop (p0, freq, d, ploidy, df_ci, dp_ci)
 
-//to make code run both with node and browser
+//hack to make code run both with node and browser
 if(typeof require!=='undefined') {
     var jStat = require('jstat').jStat
     var BigNumber = require('bignumber.js')
@@ -59,6 +59,8 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
     var ddf = 0.005
 	var ddp = 0.01
 
+
+
     //[~, df] = binofit(round(d*freq), d, df_ci);
     // fs = df(1) : ddf : df(2); 
     // fs = sort([fs(1:end-1), df(2)]);
@@ -78,6 +80,71 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 	console.log('fs ', fs, fs.length)
 
 	console.log('dp ', dp, dp.length)
+
+
+
+    //new chart 
+    /*
+
+        for j=1:length(dp);
+            p = dp (j);
+            ff(1) = (p)/(2*(1-p)+1*p); %somatic LOH
+            if (ploidy > 1)
+                l = size(ff);
+                for i=1:ploidy
+                    ff(l+i) = (i*p)/(2*(1-p)+ploidy*p); %somatic LOH high CN
+                end
+            end
+            l = length(ff);
+            ff(l+1) = (1-p+p)/(2*(1-p)+1*p); %germline LOH high CN;        
+            if (ploidy > 1)
+                l = length(ff);
+                for i=1:ploidy
+                    ff(l+i) = (1-p+i*p)/(2*(1-p)+ploidy*p); %germline LOH high CN;
+                end
+            end
+            all_freq(j,1:size(types, 2)) = ff;
+            clear ff;
+        end
+
+        figure;
+
+        for i=1:size(types, 2)
+            pp(i) = plot (all_freq(:, i), dp, '-', 'Color', c_type{i}, 'MarkerSize', 5, 'LineWidth', 2);  
+            hold on;
+        end
+
+
+    */
+    var dp2 = sequence(0, 1, 0.01)
+
+    all_freq = []
+    for(var i=0; i<types.length; i++) {
+        all_freq.push([])
+    }
+    console.log(all_freq)
+    for(var j = 0; j < dp2.length; j++) {
+        var ff = []
+        p = dp2[j]
+        ff.push( (p)/(2*(1-p)+1*p) )
+        if (ploidy > 1) {
+            for(var i=0; i<ploidy; i++) {
+                ff.push((i*p)/(2*(1-p)+ploidy*p))
+            }
+        }
+        ff.push( (1-p+p)/(2*(1-p)+1*p) ) // %germline LOH high CN; 
+        if (ploidy > 1) {
+            for(var i=0; i<ploidy; i++) {
+                ff.push((1-p+i*p)/(2*(1-p)+ploidy*p))
+            }
+        }
+        ff.forEach(function(fff, i) {
+            all_freq[i].push(fff)
+        })
+        //all_freq.push(ff)
+
+    }   
+    console.log('ALL_FREQ', all_freq[0], all_freq[1]) 
 
 	//aics = zeros (length(fs), length(dp), size(types, 2));
 
@@ -364,7 +431,8 @@ end
     }
     console.log(plotData)
 
-    return [fs, plotData]
+
+    return [fs, plotData, all_freq]
 
 
 }// what is this?
