@@ -125,7 +125,6 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
     for(var i=0; i<types.length; i++) {
         all_freq.push([])
     }
-    console.log(all_freq)
     for(var j = 0; j < dp2.length; j++) {
         var ff = []
         p = dp2[j]
@@ -147,6 +146,7 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
         //all_freq.push(ff)
 
     }   
+    console.log('all_freq', all_freq)
 
 	//aics = zeros (length(fs), length(dp), size(types, 2));
 

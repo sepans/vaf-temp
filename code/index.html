@@ -4,11 +4,22 @@
 		<meta charset="utf-8">
 		<style>
 		html {
-			font-family: arial;
+			font-family:  sans-serif, helvetica, arial;
+		}
+
+		.container {
+			width: 95%;
+			max-width: 1050px;
+			margin: 0 auto;
+
 		}
 
 		.axis--x path {
 		  /*display: none;*/
+		}
+
+		.axis-lable {
+			font-size: 12px;
 		}
 
 		.line {
@@ -21,17 +32,34 @@
 		#variables {
 			width: 100%;
 			z-index: 2;
+			font-size: 14px;
 		}
 
 		.variable {
-			width: 150px;
+			width: 120px;
 			padding: 5px 10px;
 			display: inline-block;
+			padding: 20px;
 		}
 
 		.variable input {
 			width: 50px;
 			float: right;
+			margin-right: 10px;
+			border: 1px solid rgba(0, 0, 255, 0.6);
+			line-height: 16px;
+			padding: 2px;
+			text-align: right;
+
+		}
+		.variable label {
+			line-height: 20px;
+		}
+		button {
+			border: 1px solid #0000FF;
+			color: #0000FF;
+			line-height: 16px;
+			background-color: white;
 		}
 		#calculating {
 			background-color: rgba(100, 100, 100, 0.5);
@@ -52,6 +80,30 @@
 			stroke: rgba(150, 150, 150, 0.5);
 		}
 
+		.desc {
+			margin: 0 auto;
+			width: 60%;
+			font-size: 12px;
+			margin-bottom: 30px;
+		}
+
+		.desc h1 {
+			font-size: 24px;
+			font-family: 'Linux Libertine','Georgia','Times',serif;
+			font-weight: normal;
+			text-align: center;
+		}
+
+		.credits {
+			margin: 0 auto;
+			width: 80%;
+			border-top: 1px solid #EEE;
+			margin-top: 50px;
+			padding: 20px;
+			font-size: 12px;
+
+		}
+
 		</style>
 		<script src="lib/d3.min.js"></script>
 		<script src="lib/bignumber.min.js"></script>
@@ -60,9 +112,20 @@
 	</head>
 	<body>
 		<div id='calculating'>calculating...</div>
-		<div id="variables"></div>
-		<svg id='chart1'></svg>
-		<svg id='chart2'></svg>
+		<div class="container">
+			<div class="desc">
+				<h1>title goes here</h1>
+				<p>
+					some description here
+				</p>
+			</div>
+			<div id="variables"></div>
+			<svg id='chart1'></svg>
+			<svg id='chart2'></svg>
+			<div class="credits">
+				credits here
+			</div>
+		<div>
 
 
 	</body>

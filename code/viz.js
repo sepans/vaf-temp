@@ -21,6 +21,13 @@ if(window.Worker) {
 	}
 }
 
+var margin = {top: 20, right: 180, bottom: 40, left: 45},
+    w = 500,
+    h = 400,
+    width = w - margin.left - margin.right,
+    height = h - margin.top - margin.bottom
+
+
 function drawCharts(allPlotData) {
 
 		var fs = allPlotData[0]
@@ -66,11 +73,6 @@ init()
 function drawChart2(all_freq, rect, lables) {
 
 	var svg = d3.select("#chart2"),
-	    margin = {top: 20, right: 170, bottom: 20, left: 50},
-	    w = 500,
-	    h = 400,
-	    width = w - margin.left - margin.right,
-	    height = h - margin.top - margin.bottom,
 	    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	svg.attr('width', w)
@@ -137,7 +139,7 @@ function drawChart2(all_freq, rect, lables) {
 	      .attr("class", "city");
 
 	  city.append("path")
-	      .attr("class", "line")
+	      .attr("class", function(d, i) { return "line"})
 	      .attr("d", function(d, i) { return line(d); })
 	      .style("stroke", function(d, i) { return z(i); });	 
 
@@ -150,17 +152,31 @@ function drawChart2(all_freq, rect, lables) {
 	      .style("fill", function(d, i) { return z(i); })
 	      .text(function(d) { return d; });
 
+	    svg.append("text")
+	    	.attr('class', 'axis-lable axis-lable-x')
+	    	.attr("transform",
+	            "translate(" + (width/2 + margin.left) + " ," + 
+	                           h + ")")
+	        .style("text-anchor", "middle")
+	        .text('x axis');
+
+
+	  // text label for the y axis
+		svg.append("text")
+	    	.attr('class', 'axis-lable axis-lable-y')
+		    .attr("transform", "translate(10,"+height/2+") rotate(-90) ")
+		    // .attr("y", 0 - margin.left)
+		    // .attr("x",0 - (height / 2))
+		    // .attr("dy", "1em")
+		    .style("text-anchor", "middle")
+		    .text("y axis"); 		    
+
 }
 
 
 function drawChart(fs, data) {
 
 	var svg = d3.select("#chart1"),
-	    margin = {top: 20, right: 170, bottom: 20, left: 50},
-	    w = 500,
-	    h = 400,
-	    width = w - margin.left - margin.right,
-	    height = h - margin.top - margin.bottom,
 	    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	svg.attr('width', w)
@@ -260,27 +276,6 @@ function drawChart(fs, data) {
 	      	.style("stroke-opacity", 0.2)
 	      	.style("fill-opacity", 0.1);
 
-	   // city.append('path')
-	   // 		.attr('class', ' area down')   
-		  //    .attr("d", function(d, i) { return downArea(d.updown) })
-	   //    	.style("fill", function(d, i) { return z(i); })
-	   //    	.style("stroke", function(d, i) { return z(i); })
-	   //    	.style("stroke-opacity", 0.2)
-	   //    	.style("fill-opacity", 0.1);
-
-
-	  // city.append("path")
-	  //     .attr("class", "line up")
-	  //     .attr("d", function(d, i) { console.log(d, i); return line(d.up); })
-	  //     .style('stroke-dasharray', '3, 3')
-	  //     .style("stroke", function(d, i) { return z(i); });
-
-	  // city.append("path")
-	  //     .attr("class", "line down")
-	  //     .attr("d", function(d, i) { return line(d.down); })
-	  //     .style('stroke-dasharray', '3, 3')
-	  //     .style("stroke", function(d, i) { return z(i); });
-	      
 	  city.selectAll('.circle')
 	  	.data(d => d.line)
 	  	.enter().append("circle")
@@ -300,6 +295,25 @@ function drawChart(fs, data) {
 	      .style("font", "10px sans-serif")
 	      .style("fill", function(d, i) { return z(i); })
 	      .text(function(d) { return d.lable; });
+
+	    svg.append("text")
+	    	.attr('class', 'axis-lable axis-lable-x')
+	    	.attr("transform",
+	            "translate(" + (width/2 + margin.left) + " ," + 
+	                           h + ")")
+	        .style("text-anchor", "middle")
+	        .text('VAF');
+
+
+	  // text label for the y axis
+		svg.append("text")
+	    	.attr('class', 'axis-lable axis-lable-y')
+		    .attr("transform", "translate(10,"+height/2+") rotate(-90) ")
+		    // .attr("y", 0 - margin.left)
+		    // .attr("x",0 - (height / 2))
+		    // .attr("dy", "1em")
+		    .style("text-anchor", "middle")
+		    .text("W"); 	      
 	      
 
 }
