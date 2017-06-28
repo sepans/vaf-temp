@@ -1,5 +1,5 @@
 var variables = ['p0', 'freq', 'd', 'ploidy', 'df_ci', 'dp_ci']
-var defaults = [0.6, 0.31, 1000, 2, 0.01, 0.05]
+var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 //var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 
 drawInputs()
@@ -16,17 +16,18 @@ function init() {
 	var fs = allPlotData[0]
 		plotData = allPlotData[1]
 		all_freq = allPlotData[2]
+		rect = allPlotData[3]
 
 	calculating.style('opacity', 0)
 
 	drawChart(fs, plotData)
 
-	drawChart2(all_freq)
+	drawChart2(all_freq, rect)
 }
 
 init()
 
-function drawChart2(all_freq) {
+function drawChart2(all_freq, rect) {
 
 	var svg = d3.select("#chart2"),
 	    margin = {top: 20, right: 80, bottom: 20, left: 50},
@@ -65,6 +66,12 @@ function drawChart2(all_freq) {
 	      .attr("dy", "0.71em")
 	      .attr("fill", "#000")
 	      //.text("Temperature, ºF");
+	  g.append('rect')
+	  	.attr('class', 'rectangle')
+	  	.attr('x', x(rect[0][0]))
+	  	.attr('y', y(rect[0][1]))
+	  	.attr('width',  Math.abs( x(rect[1][0]) - x(rect[0][0])))
+	  	.attr('height', Math.abs( y(rect[1][1]) - y(rect[0][1])))
 
 	  var city = g.selectAll(".city")
 	    .data(all_freq)
@@ -199,7 +206,7 @@ function drawChart(fs, data) {
 	  	.attr('class', 'circle')
 	  	.attr('r', function(d) { return 3})
 	    .style("stroke", function(d, i, a) { 
-	    	return z(plotData.indexOf(this.parentNode.__data__))
+	    	return z(data.indexOf(this.parentNode.__data__))
 	    })
 	    .attr('cx', function(d, i) { return x(fs[i]); })
 	    .attr('cy', function(d) { return y(d); });

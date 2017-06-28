@@ -39,15 +39,15 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 // aics = zeros (length(fs), length(dp), size(types, 2));
 
 	var types = [];
-	//types.push('Somatic LOH CNmut = 1') 
-	if (ploidy > 0) {
+	types.push('Somatic LOH CNmut = 1') 
+	if (ploidy > 1) {
         for(var i=0; i<ploidy; i++) {
         	types.push('Somatic, CNmut = ' + (i + 1))
         }
     }
 
-	//types.push('Germline LOH CNmut = 1') 
-	if (ploidy > 0) {
+	types.push('Germline LOH CNmut = 1') 
+	if (ploidy > 1) {
         for(var i=0; i<ploidy; i++) {
         	types.push('Germline, CNmut = ' + (i + 1))
         }
@@ -81,6 +81,7 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 
 	console.log('dp ', dp, dp.length)
 
+    var rectangle = [[dp[0], fs[0]], [dp[dp.length -1], fs[fs.length -1]] ]
 
 
     //new chart 
@@ -144,11 +145,11 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
         //all_freq.push(ff)
 
     }   
-    console.log('ALL_FREQ', all_freq[0], all_freq[1]) 
 
 	//aics = zeros (length(fs), length(dp), size(types, 2));
 
 	aics = zeros(fs.length, dp.length, types.length)
+
 
 	//console.log(zeros(3,2,2))
 
@@ -432,7 +433,7 @@ end
     console.log(plotData)
 
 
-    return [fs, plotData, all_freq]
+    return [fs, plotData, all_freq, rectangle]
 
 
 }// what is this?
