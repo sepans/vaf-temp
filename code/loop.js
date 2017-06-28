@@ -131,18 +131,19 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
         ff.push( (p)/(2*(1-p)+1*p) )
         if (ploidy > 1) {
             for(var i=0; i<ploidy; i++) {
-                ff.push((i*p)/(2*(1-p)+ploidy*p))
+                ff.push(((i + 1)*p)/(2*(1-p)+ploidy*p))
             }
         }
         ff.push( (1-p+p)/(2*(1-p)+1*p) ) // %germline LOH high CN; 
         if (ploidy > 1) {
             for(var i=0; i<ploidy; i++) {
-                ff.push((1-p+i*p)/(2*(1-p)+ploidy*p))
+                ff.push((1-p+(i + 1)*p)/(2*(1-p)+ploidy*p))
             }
         }
         ff.forEach(function(fff, i) {
             all_freq[i].push(fff)
         })
+        //debugger;
         //all_freq.push(ff)
 
     }   
@@ -411,7 +412,6 @@ end
         //wfmat = math.matrix(wf)
         //newMat = wfmat.subset([0, 16], [0, 8], k)
         var kSlice = slice3DDim3(wf, k)
-        console.log(kSlice)
         var means2ndDim = kSlice.map(function(dim1) { return d3.mean(dim1)})
         var std2ndDim = kSlice.map(function(dim1) { return d3.deviation(dim1)})
         var up = means2ndDim.map(function(mean, i) {
