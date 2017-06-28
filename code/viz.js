@@ -25,7 +25,7 @@ if(window.Worker) {
 		calculating.style('display', 'none')
 
 		d3.select('#chart1 g').remove()
-		d3.select('#chart2 g').remove()
+		d3.select('#chart2').selectAll('g').remove()
 
 		drawChart(fs, plotData)
 
@@ -137,6 +137,15 @@ function drawChart(fs, data) {
 	data.map(d => {
 		return d.updown = d.up.map((dd, i) => { return {up: d.up[i], down: d.down[i]}}) 
 	})
+	
+	//remove zeros and ones
+	data = data.filter(d => {
+		var sum = Math.round(d3.sum(d.line) * 1000) / 1000
+		var zeroOrOne = sum===0 || sum===d.line.length
+		console.log(d.line, sum ,zeroOrOne)
+		return !zeroOrOne
+	})
+
 	console.log('data',data)
 	console.log('DATA',data[0].line)
 
