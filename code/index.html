@@ -8,7 +8,7 @@
 		}
 
 		.axis--x path {
-		  display: none;
+		  /*display: none;*/
 		}
 
 		.line {
@@ -30,7 +30,7 @@
 		}
 
 		.variable input {
-			width: 80px;
+			width: 50px;
 			float: right;
 		}
 		#calculating {
@@ -47,9 +47,9 @@
 
 		}
 
-		.rectangle {
-			fill: rgba(100, 100, 100, 0.5);
-			stroke: rgba(100, 100, 100, 0.8);
+		.rectangle, .cross {
+			fill: rgba(150, 150, 150, 0.2);
+			stroke: rgba(150, 150, 150, 0.5);
 		}
 
 		</style>
@@ -61,8 +61,8 @@
 	<body>
 		<div id='calculating'>calculating...</div>
 		<div id="variables"></div>
-		<svg id='chart1' width="520" height="500"></svg>
-		<svg id='chart2' width="400" height="500"></svg>
+		<svg id='chart1'></svg>
+		<svg id='chart2'></svg>
 
 
 	</body>

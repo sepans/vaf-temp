@@ -1,4 +1,4 @@
-var variables = ['p p', 'freq', 'd', 'ploidy', 'df_ci', 'dp_ci']
+var variables = ['Purity', 'VAF', 'Depth', 'ploidy', 'df_ci', 'dp_ci']
 var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 //var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 
@@ -33,9 +33,11 @@ function drawCharts(allPlotData) {
 		d3.select('#chart1 g').remove()
 		d3.select('#chart2').selectAll('g').remove()
 
+		console.log('lables', plotData.map(d => d.lable))
+
 		drawChart(fs, plotData)
 
-		drawChart2(all_freq, rect)
+		drawChart2(all_freq, rect, plotData.map(d => d.lable))
 
 }
 
@@ -61,13 +63,18 @@ function init() {
 
 init()
 
-function drawChart2(all_freq, rect) {
+function drawChart2(all_freq, rect, lables) {
 
 	var svg = d3.select("#chart2"),
-	    margin = {top: 20, right: 80, bottom: 20, left: 50},
-	    width = 400 - margin.left - margin.right,
-	    height = 500 - margin.top - margin.bottom,
+	    margin = {top: 20, right: 170, bottom: 20, left: 50},
+	    w = 500,
+	    h = 400,
+	    width = w - margin.left - margin.right,
+	    height = h - margin.top - margin.bottom,
 	    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	svg.attr('width', w)
+		.attr('height', h)
 
 	var x = d3.scaleLinear().range([0, width]),//d3.scaleTime().range([0, width]),
 	    y = d3.scaleLinear().range([height, 0]),
@@ -103,9 +110,26 @@ function drawChart2(all_freq, rect) {
 	  g.append('rect')
 	  	.attr('class', 'rectangle')
 	  	.attr('x', x(rect[0][0]))
-	  	.attr('y', y(rect[0][1]))
-	  	.attr('width',  Math.abs( x(rect[1][0]) - x(rect[0][0])))
-	  	.attr('height', Math.abs( y(rect[1][1]) - y(rect[0][1])))
+	  	.attr('y', y(rect[1][1]))
+	  	.attr('width',  x(rect[1][0]) - x(rect[0][0]))
+	  	.attr('height', y(rect[0][1]) - y(rect[1][1]))
+
+	  console.log('rect', rect)
+
+	  g.append('line')
+	  	.attr('class', 'cross')
+	  	.attr('x1', x((rect[0][0] + rect[1][0])/2))
+	  	.attr('y1', y((rect[0][1] + rect[1][1])/2) - 5)
+	  	.attr('x2', x((rect[0][0] + rect[1][0])/2))
+	  	.attr('y2', y((rect[0][1] + rect[1][1])/2) + 5)
+
+	  g.append('line')
+	  	.attr('class', 'cross')
+	  	.attr('x1', x((rect[0][0] + rect[1][0])/2) - 5)
+	  	.attr('y1', y((rect[0][1] + rect[1][1])/2))
+	  	.attr('x2', x((rect[0][0] + rect[1][0])/2) + 5)
+	  	.attr('y2', y((rect[0][1] + rect[1][1])/2))
+
 
 	  var city = g.selectAll(".city")
 	    .data(all_freq)
@@ -117,16 +141,30 @@ function drawChart2(all_freq, rect) {
 	      .attr("d", function(d, i) { return line(d); })
 	      .style("stroke", function(d, i) { return z(i); });	 
 
+	  city.append("text")
+	      .data(lables)
+	      .attr("transform", function(d, i) { return "translate("+(width + 10)+"," + (i*15) + ")"; })
+	      .attr("x", 3)
+	      .attr("dy", "0.35em")
+	      .style("font", "10px sans-serif")
+	      .style("fill", function(d, i) { return z(i); })
+	      .text(function(d) { return d; });
+
 }
 
 
 function drawChart(fs, data) {
 
 	var svg = d3.select("#chart1"),
-	    margin = {top: 20, right: 80, bottom: 30, left: 50},
-	    width = 400 - margin.left - margin.right,
-	    height = 500 - margin.top - margin.bottom,
+	    margin = {top: 20, right: 170, bottom: 20, left: 50},
+	    w = 500,
+	    h = 400,
+	    width = w - margin.left - margin.right,
+	    height = h - margin.top - margin.bottom,
 	    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	svg.attr('width', w)
+		.attr('height', h)
 
 	data.map(d => {
 		return d.updown = d.up.map((dd, i) => { return {up: d.up[i], down: d.down[i]}}) 
@@ -256,7 +294,7 @@ function drawChart(fs, data) {
 
 	  city.append("text")
 	      .datum(function(d) { return d})
-	      .attr("transform", function(d, i) { return "translate(300," + (i*15) + ")"; })
+	      .attr("transform", function(d, i) { return "translate("+(width + 10)+"," + (i*15) + ")"; })
 	      .attr("x", 3)
 	      .attr("dy", "0.35em")
 	      .style("font", "10px sans-serif")
@@ -275,7 +313,7 @@ function drawInputs() {
 		.classed('variable', true)
 
 	variableItems.append('label')
-		.text(d => d)
+		.text(d => d+':')
 
 	variableItems.append('input')
 		.attr('id', d => toInputId(d))

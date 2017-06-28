@@ -68,6 +68,8 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
     var binoret = binofit(d*freq, d, (1 - df_ci) * 100)
     console.log(d*freq, d, df_ci, binoret)
 
+    var ddp2 = [p0*(1-dp_ci), p0*(1+dp_ci)]
+
 	//fs = [freq*(1-df_ci), ddf, freq*(1+df_ci)].sort()
 	//dp = [p0*(1-dp_ci) : ddp : p0*(1+dp_ci)].sort()
 	var fs = sequence(binoret[0], binoret[1], ddf)
@@ -81,7 +83,7 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 
 	console.log('dp ', dp, dp.length)
 
-    var rectangle = [[dp[0], fs[0]], [dp[dp.length -1], fs[fs.length -1]] ]
+    var rectangle = [[binoret[0], binoret[1]], [ddp2[0], ddp2[1]] ]
 
 
     //new chart 
