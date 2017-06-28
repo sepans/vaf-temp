@@ -1,4 +1,4 @@
-var variables = ['p0', 'freq', 'd', 'ploidy', 'df_ci', 'dp_ci']
+var variables = ['p p', 'freq', 'd', 'ploidy', 'df_ci', 'dp_ci']
 var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 //var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 
@@ -16,7 +16,13 @@ if(window.Worker) {
 	  
 	  console.log('Message received from worker', e.data);
 
-		allPlotData = e.data
+	  drawCharts(e.data)
+
+	}
+}
+
+function drawCharts(allPlotData) {
+
 		var fs = allPlotData[0]
 			plotData = allPlotData[1]
 			all_freq = allPlotData[2]
@@ -31,7 +37,6 @@ if(window.Worker) {
 
 		drawChart2(all_freq, rect)
 
-	}
 }
 
 
@@ -45,18 +50,7 @@ function init() {
 	}
 	else {
 		allPlotData = CalcP_dp_Ploidy_3D.apply(this, defaults)
-		var fs = allPlotData[0]
-			plotData = allPlotData[1]
-			all_freq = allPlotData[2]
-			rect = allPlotData[3]
-
-		calculating.style('display', 'none')
-
-
-		drawChart(fs, plotData)
-
-		drawChart2(all_freq, rect)
-
+		drawCharts(allPlotData)
 	}
 
 	 
@@ -284,7 +278,7 @@ function drawInputs() {
 		.text(d => d)
 
 	variableItems.append('input')
-		.attr('id', d => 'input-'+d)
+		.attr('id', d => toInputId(d))
 		.attr('value', (d,i) => defaults[i])
 
 	variableEl.append('button')
@@ -293,7 +287,7 @@ function drawInputs() {
 			console.log('calculating opacity 1 on')
 			calculating.style('display', 'block')
 
-			var values = variables.map(d => +document.getElementById('input-'+d).value)
+			var values = variables.map(d => +document.getElementById(toInputId(d)).value)
 			console.log('values', values)
 			if(myWorker) {
 				myWorker.postMessage([values])
@@ -301,20 +295,14 @@ function drawInputs() {
 			else {
 				var allPlotData = CalcP_dp_Ploidy_3D.apply(this, values)
 
-				var fs = allPlotData[0]
-					plotData = allPlotData[1]
-					all_freq = allPlotData[2]
-					rect = allPlotData[3]
-
-				console.log('draw new chart', allPlotData)
-				d3.select('#chart1 g').remove()
-				console.log('calculating opacity 0')
-				calculating.style('display', 'none')
-				drawChart(fs, plotData)
-
-				drawChart2(all_freq, rect)
+				drawCharts(allPlotData)
 
 			}
 		})
 
+}
+
+function toInputId(d) {
+	console.log(d, 'input-'+d.toLowerCase().split(' ').join('-'))
+	return 'input-'+d.toLowerCase().split(' ').join('-')
 }
