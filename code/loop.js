@@ -128,14 +128,14 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
     for(var j = 0; j < dp2.length; j++) {
         var ff = []
         p = dp2[j]
-        ff.push( (p)/(2*(1-p)+1*p) )
-        if (ploidy > 1) {
+        //ff.push( (p)/(2*(1-p)+1*p) )
+        if (ploidy > 0) {
             for(var i=0; i<ploidy; i++) {
                 ff.push(((i + 1)*p)/(2*(1-p)+ploidy*p))
             }
         }
-        ff.push( (1-p+p)/(2*(1-p)+1*p) ) // %germline LOH high CN; 
-        if (ploidy > 1) {
+        //ff.push( (1-p+p)/(2*(1-p)+1*p) ) // %germline LOH high CN; 
+        if (ploidy > 0) {
             for(var i=0; i<ploidy; i++) {
                 ff.push((1-p+(i + 1)*p)/(2*(1-p)+ploidy*p))
             }

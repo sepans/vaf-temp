@@ -44,7 +44,7 @@ function drawCharts(allPlotData) {
 
 		drawChart(fs, plotData)
 
-		drawChart2(all_freq, rect, plotData.map(d => d.lable))
+		drawChart2(all_freq, rect, plotData.map(d => d.lable).filter(d => d))
 
 }
 
@@ -93,7 +93,10 @@ function drawChart2(all_freq, rect, lables) {
 	  //y.domain([d3.min(data, d => d3.min(d.up)), d3.max(data, d => d3.max(d.down))]);
 	y.domain([0, 1])
 
-	 z.domain(all_freq.length);
+	z.domain(lables);
+
+	console.log('domain 2', lables, lables.map(d => z(d)))
+
 
 	  g.append("g")
 	      .attr("class", "axis axis--x")
@@ -141,7 +144,7 @@ function drawChart2(all_freq, rect, lables) {
 	  city.append("path")
 	      .attr("class", function(d, i) { return "line"})
 	      .attr("d", function(d, i) { return line(d); })
-	      .style("stroke", function(d, i) { return z(i); });	 
+	      .style("stroke", function(d, i) { return z(lables[i]); });	 
 
 	  city.append("text")
 	      .data(lables)
@@ -149,7 +152,7 @@ function drawChart2(all_freq, rect, lables) {
 	      .attr("x", 3)
 	      .attr("dy", "0.35em")
 	      .style("font", "10px sans-serif")
-	      .style("fill", function(d, i) { return z(i); })
+	      .style("fill", function(d, i) { return z(lables[i]); })
 	      .text(function(d) { return d; });
 
 	    svg.append("text")
@@ -158,7 +161,7 @@ function drawChart2(all_freq, rect, lables) {
 	            "translate(" + (width/2 + margin.left) + " ," + 
 	                           h + ")")
 	        .style("text-anchor", "middle")
-	        .text('x axis');
+	        .text('Varriant allele frequency (VAF)');
 
 
 	  // text label for the y axis
@@ -186,20 +189,27 @@ function drawChart(fs, data) {
 		return d.updown = d.up.map((dd, i) => { return {up: d.up[i], down: d.down[i]}}) 
 	})
 	
+	var z = d3.scaleOrdinal(d3.schemeCategory10);
+	var lables = data.map(d => d.lable).filter(d => d)
+	z.domain(lables);
+
+	console.log('domain 1', lables, lables.map(d => z(d)))
+
+
 	//remove zeros and ones
 	data = data.filter(d => {
 		var sum = Math.round(d3.sum(d.line) * 1000) / 1000
-		var zeroOrOne = sum===0 || sum===d.line.length
+		var zeroOrOne = sum===0 
 		console.log(d.line, sum ,zeroOrOne)
 		return !zeroOrOne
 	})
 
 	console.log('data',data)
-	console.log('DATA',data[0].line)
+	//console.log('DATA',data[0].line)
 
 	var x = d3.scaleLinear().range([0, width]),//d3.scaleTime().range([0, width]),
-	    y = d3.scaleLinear().range([height, 0]),
-	    z = d3.scaleOrdinal(d3.schemeCategory10);
+	    y = d3.scaleLinear().range([height, 0]);
+	    
 //	    z2 = d3.scaleOrdinal(d3.schemeCategory10);
 
 	var dataLenght = data[0].line.length
@@ -241,7 +251,6 @@ function drawChart(fs, data) {
 	  //y.domain([d3.min(data, d => d3.min(d.up)), d3.max(data, d => d3.max(d.down))]);
 	  y.domain([0, 1])
 
-	  z.domain(data.length);
 
 	  g.append("g")
 	      .attr("class", "axis axis--x")
@@ -266,13 +275,13 @@ function drawChart(fs, data) {
 	  city.append("path")
 	      .attr("class", "line")
 	      .attr("d", function(d, i) { return line(d.line); })
-	      .style("stroke", function(d, i) { return z(i); });
+	      .style("stroke", function(d, i) {return z(d.lable); });
 
 	   city.append('path')
 	   		.attr('class', ' area up')   
 		     .attr("d", function(d, i) { return upArea(d.updown) })
-	      	.style("fill", function(d, i) { return z(i); })
-	      	.style("stroke", function(d, i) { return z(i); })
+	      	.style("fill", function(d, i) { return z(d.lable); })
+	      	.style("stroke", function(d, i) { return z(d.lable); })
 	      	.style("stroke-opacity", 0.2)
 	      	.style("fill-opacity", 0.1);
 
@@ -282,7 +291,7 @@ function drawChart(fs, data) {
 	  	.attr('class', 'circle')
 	  	.attr('r', function(d) { return 3})
 	    .style("stroke", function(d, i, a) { 
-	    	return z(data.indexOf(this.parentNode.__data__))
+	    	return z(this.parentNode.__data__.lable)
 	    })
 	    .attr('cx', function(d, i) { return x(fs[i]); })
 	    .attr('cy', function(d) { return y(d); });
@@ -293,7 +302,7 @@ function drawChart(fs, data) {
 	      .attr("x", 3)
 	      .attr("dy", "0.35em")
 	      .style("font", "10px sans-serif")
-	      .style("fill", function(d, i) { return z(i); })
+	      .style("fill", function(d, i) { return z(d.lable); })
 	      .text(function(d) { return d.lable; });
 
 	    svg.append("text")
@@ -302,7 +311,7 @@ function drawChart(fs, data) {
 	            "translate(" + (width/2 + margin.left) + " ," + 
 	                           h + ")")
 	        .style("text-anchor", "middle")
-	        .text('VAF');
+	        .text('Varriant allele frequency (VAF)');
 
 
 	  // text label for the y axis
