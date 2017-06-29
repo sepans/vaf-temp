@@ -116,8 +116,8 @@ function drawChart2(all_freq, rect, lables) {
 	  	.attr('class', 'rectangle')
 	  	.attr('x', x(rect[0][0]))
 	  	.attr('y', y(rect[1][1]))
-	  	.attr('width',  x(rect[1][0]) - x(rect[0][0]))
-	  	.attr('height', y(rect[0][1]) - y(rect[1][1]))
+	  	.attr('width',  Math.abs(x(rect[1][0]) - x(rect[0][0])))
+	  	.attr('height', Math.abs(y(rect[0][1]) - y(rect[1][1])))
 
 	  console.log('rect', rect)
 

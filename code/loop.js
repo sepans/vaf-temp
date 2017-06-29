@@ -39,15 +39,15 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 // aics = zeros (length(fs), length(dp), size(types, 2));
 
 	var types = [];
-	types.push('Somatic LOH CNmut = 1') 
-	if (ploidy > 1) {
+	//types.push('Somatic LOH CNmut = 1') 
+	if (ploidy > 0) {
         for(var i=0; i<ploidy; i++) {
         	types.push('Somatic, CNmut = ' + (i + 1))
         }
     }
 
-	types.push('Germline LOH CNmut = 1') 
-	if (ploidy > 1) {
+	//types.push('Germline LOH CNmut = 1') 
+	if (ploidy > 0) {
         for(var i=0; i<ploidy; i++) {
         	types.push('Germline, CNmut = ' + (i + 1))
         }
