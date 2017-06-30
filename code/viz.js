@@ -80,7 +80,7 @@ function drawChart2(all_freq, rect, lables) {
 
 	var x = d3.scaleLinear().range([0, width]),//d3.scaleTime().range([0, width]),
 	    y = d3.scaleLinear().range([height, 0]),
-	    z = d3.scaleOrdinal(d3.schemeCategory10);
+	    z = d3.scaleOrdinal(d3.schemeCategory20);
 //	    z2 = d3.scaleOrdinal(d3.schemeCategory10);
 
 	var line = d3.line()
@@ -203,7 +203,7 @@ function drawChart(fs, data) {
 		return d.updown = d.up.map((dd, i) => { return {up: d.up[i], down: d.down[i]}}) 
 	})
 	
-	var z = d3.scaleOrdinal(d3.schemeCategory10);
+	var z = d3.scaleOrdinal(d3.schemeCategory20);
 	var lables = data.map(d => d.lable).filter(d => d)
 	z.domain(lables);
 
