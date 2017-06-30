@@ -1,5 +1,5 @@
-var variables = ['Purity', 'VAF', 'Depth', 'ploidy', 'df_ci', 'dp_ci']
-var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
+var variables = ['Purity', 'VAF', 'Depth', 'Ploidy', 'Purity CI', 'VAF CI']
+var defaults = [0.6, 0.5, 1000, 2, 0.05, 0.01]
 //var defaults = [0.6, 0.5, 1000, 2, 0.01, 0.05]
 
 drawInputs()
