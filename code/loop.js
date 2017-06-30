@@ -7,7 +7,7 @@ if(typeof require!=='undefined') {
     var math = require('mathjs');
 }
 
-function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
+function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, dp_ci, df_ci,) {
 
     console.log('called with args', arguments)
 // types = {};

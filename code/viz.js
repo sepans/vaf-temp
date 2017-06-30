@@ -173,7 +173,7 @@ function drawChart2(all_freq, rect, lables) {
 	    	.attr('class', 'axis-lable axis-lable-x')
 	    	.attr("transform",
 	            "translate(" + (width/2 + margin.left) + " ," + 
-	                           h + ")")
+	                           (h - 5) + ")")
 	        .style("text-anchor", "middle")
 	        .text('Varriant allele frequency (VAF)');
 
@@ -186,7 +186,7 @@ function drawChart2(all_freq, rect, lables) {
 		    // .attr("x",0 - (height / 2))
 		    // .attr("dy", "1em")
 		    .style("text-anchor", "middle")
-		    .text("y axis"); 		    
+		    .text("Purity"); 		    
 
 }
 
@@ -323,7 +323,7 @@ function drawChart(fs, data) {
 	    	.attr('class', 'axis-lable axis-lable-x')
 	    	.attr("transform",
 	            "translate(" + (width/2 + margin.left) + " ," + 
-	                           h + ")")
+	                           (h - 5) + ")")
 	        .style("text-anchor", "middle")
 	        .text('Varriant allele frequency (VAF)');
 
@@ -336,7 +336,7 @@ function drawChart(fs, data) {
 		    // .attr("x",0 - (height / 2))
 		    // .attr("dy", "1em")
 		    .style("text-anchor", "middle")
-		    .text("W"); 	      
+		    .text("Akaike Information Criterion Weight"); 	      
 	      
 
 }
