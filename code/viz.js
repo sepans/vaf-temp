@@ -175,7 +175,7 @@ function drawChart2(all_freq, rect, lables) {
 	            "translate(" + (width/2 + margin.left) + " ," + 
 	                           (h - 5) + ")")
 	        .style("text-anchor", "middle")
-	        .text('Variant allele frequency (VAF)');
+	        .text('Variant Allele Frequency (VAF)');
 
 
 	  // text label for the y axis
@@ -327,7 +327,7 @@ function drawChart(fs, data) {
 	            "translate(" + (width/2 + margin.left) + " ," + 
 	                           (h - 5) + ")")
 	        .style("text-anchor", "middle")
-	        .text('Variant allele frequency (VAF)');
+	        .text('Variant Allele Frequency (VAF)');
 
 
 	  // text label for the y axis

@@ -39,14 +39,18 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, dp_ci, df_ci,) {
 // aics = zeros (length(fs), length(dp), size(types, 2));
 
 	var types = [];
-	//types.push('Somatic LOH CNmut = 1') 
+    if(ploidy==2) {
+        types.push('Somatic, CNmut = 1') 
+    }
 	if (ploidy > 0) {
         for(var i=0; i<ploidy; i++) {
         	types.push('Somatic, CNmut = ' + (i + 1))
         }
     }
 
-	//types.push('Germline LOH CNmut = 1') 
+    if(ploidy==2) {
+        types.push('Germline, CNmut = 1') 
+    }
 	if (ploidy > 0) {
         for(var i=0; i<ploidy; i++) {
         	types.push('Germline, CNmut = ' + (i + 1))
@@ -133,13 +137,18 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, dp_ci, df_ci,) {
     for(var j = 0; j < dp2.length; j++) {
         var ff = []
         p = dp2[j]
-        //ff.push( (p)/(2*(1-p)+1*p) )
+
+        if(ploidy==2) {
+            ff.push( (p)/(2*(1-p)+1*p) )
+        }
         if (ploidy > 0) {
             for(var i=0; i<ploidy; i++) {
                 ff.push(((i + 1)*p)/(2*(1-p)+ploidy*p))
             }
         }
-        //ff.push( (1-p+p)/(2*(1-p)+1*p) ) // %germline LOH high CN; 
+        if(ploidy==2) {
+            ff.push( (1-p+p)/(2*(1-p)+1*p) ) // %germline LOH high CN; 
+        }
         if (ploidy > 0) {
             for(var i=0; i<ploidy; i++) {
                 ff.push((1-p+(i + 1)*p)/(2*(1-p)+ploidy*p))
@@ -209,7 +218,9 @@ end
 
 			var aic = []
 			//aic[0] = 2 - 2 * Math.log( binopdf( Math.round(d*f), d, (p)/(2*(1-p)+1*p))) 
-
+            if(ploidy==2) {
+                aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (p)/(2*(1-p)+1*p))) )
+            }
 			if (ploidy > 0) {
 				for(var i = 1; i <= ploidy; i++) {
 					aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (i * p)/(2*(1-p)+ploidy*p))) )
@@ -218,6 +229,9 @@ end
 
         //aic(l+1) = 2 - 2 * log (binopdf (round(d*f), d, (1-p+p)/(2*(1-p)+1*p))); %germline LOH high CN;        
 			//aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (1-p + p)/(2*(1-p)+1*p))) )
+            if(ploidy==2) {
+                aic.push(2 - 2 * Math.log( binopdf( Math.round(d*f), d, (1-p + p)/(2*(1-p)+1*p))) )
+            }
 
 			if (ploidy > 0) {
 				for(var i = 1; i <= ploidy; i++) {
