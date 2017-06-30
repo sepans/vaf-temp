@@ -83,7 +83,12 @@ function CalcP_dp_Ploidy_3D(p0, freq, d, ploidy, df_ci, dp_ci) {
 
 	console.log('dp ', dp, dp.length)
 
-    var rectangle = [[binoret[0], binoret[1]], [ddp2[0], ddp2[1]] ]
+    var rectangle = {
+        x: binoret[0],
+        y: ddp2[1], 
+        width: Math.abs(binoret[1] - binoret[0] ),
+        height: Math.abs(ddp2[1] - ddp2[0] )
+    }
 
 
     //new chart 

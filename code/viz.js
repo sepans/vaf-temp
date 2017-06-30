@@ -114,26 +114,40 @@ function drawChart2(all_freq, rect, lables) {
 	      //.text("Temperature, ºF");
 	  g.append('rect')
 	  	.attr('class', 'rectangle')
-	  	.attr('x', x(rect[0][0]))
-	  	.attr('y', y(rect[1][1]))
-	  	.attr('width',  Math.abs(x(rect[1][0]) - x(rect[0][0])))
-	  	.attr('height', Math.abs(y(rect[0][1]) - y(rect[1][1])))
+	  	.attr('x', x(rect.x))
+	  	.attr('y', y(rect.y))
+	  	.attr('width',  x(rect.width))
+	  	.attr('height', y(1 - rect.height))
 
 	  console.log('rect', rect)
 
-	  g.append('line')
-	  	.attr('class', 'cross')
-	  	.attr('x1', x((rect[0][0] + rect[1][0])/2))
-	  	.attr('y1', y((rect[0][1] + rect[1][1])/2) - 5)
-	  	.attr('x2', x((rect[0][0] + rect[1][0])/2))
-	  	.attr('y2', y((rect[0][1] + rect[1][1])/2) + 5)
+	  // g.append('line')
+	  // 	.attr('class', 'cross')
+	  // 	.attr('x1', x((rect[0][0] + rect[1][0])/2))
+	  // 	.attr('y1', y((rect[0][1] + rect[1][1])/2) - 5)
+	  // 	.attr('x2', x((rect[0][0] + rect[1][0])/2))
+	  // 	.attr('y2', y((rect[0][1] + rect[1][1])/2) + 5)
+
+	  // g.append('line')
+	  // 	.attr('class', 'cross')
+	  // 	.attr('x1', x((rect[0][0] + rect[1][0])/2) - 5)
+	  // 	.attr('y1', y((rect[0][1] + rect[1][1])/2))
+	  // 	.attr('x2', x((rect[0][0] + rect[1][0])/2) + 5)
+	  // 	.attr('y2', y((rect[0][1] + rect[1][1])/2))
 
 	  g.append('line')
 	  	.attr('class', 'cross')
-	  	.attr('x1', x((rect[0][0] + rect[1][0])/2) - 5)
-	  	.attr('y1', y((rect[0][1] + rect[1][1])/2))
-	  	.attr('x2', x((rect[0][0] + rect[1][0])/2) + 5)
-	  	.attr('y2', y((rect[0][1] + rect[1][1])/2))
+	  	.attr('x1', x(defaults[1]))
+	  	.attr('y1', y(defaults[0]) - 5)
+	  	.attr('x2', x(defaults[1]))
+	  	.attr('y2', y(defaults[0]) + 5)
+
+	  g.append('line')
+	  	.attr('class', 'cross')
+	  	.attr('x1', x(defaults[1]) - 5)
+	  	.attr('y1', y(defaults[0]))
+	  	.attr('x2', x(defaults[1]) + 5)
+	  	.attr('y2', y(defaults[0]))
 
 
 	  var city = g.selectAll(".city")
@@ -349,6 +363,8 @@ function drawInputs() {
 			calculating.style('display', 'block')
 
 			var values = variables.map(d => +document.getElementById(toInputId(d)).value)
+			// just update it globally to use for drawing gray cross
+			defaults = values
 			console.log('values', values)
 			if(myWorker) {
 				myWorker.postMessage([values])
