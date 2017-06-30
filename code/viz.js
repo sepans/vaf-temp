@@ -22,7 +22,7 @@ if(window.Worker) {
 }
 
 var margin = {top: 20, right: 180, bottom: 40, left: 45},
-    w = 500,
+    w = 600,
     h = 400,
     width = w - margin.left - margin.right,
     height = h - margin.top - margin.bottom
@@ -101,7 +101,7 @@ function drawChart2(all_freq, rect, lables) {
 	  g.append("g")
 	      .attr("class", "axis axis--x")
 	      .attr("transform", "translate(0," + height + ")")
-	      .call(d3.axisBottom(x));
+	      .call(d3.axisBottom(x))
 
 	  g.append("g")
 	      .attr("class", "axis axis--y")
@@ -269,7 +269,9 @@ function drawChart(fs, data) {
 	  g.append("g")
 	      .attr("class", "axis axis--x")
 	      .attr("transform", "translate(0," + height + ")")
-	      .call(d3.axisBottom(x));
+	      .call(d3.axisBottom(x))
+	      	// .ticks(12)
+	      	// .tickFormat(d3.format(".2f")))
 
 	  g.append("g")
 	      .attr("class", "axis axis--y")
@@ -357,7 +359,7 @@ function drawInputs() {
 		.attr('value', (d,i) => defaults[i])
 
 	variableEl.append('button')
-		.text( 'draw')
+		.text( 'Run LOHGIC')
 		.on('click', function(e) {
 			console.log('calculating opacity 1 on')
 			calculating.style('display', 'block')
